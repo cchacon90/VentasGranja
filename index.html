@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Ventas - Emprendimiento Avícola</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: white;
+            color: #333;
+            line-height: 1.4;
+            font-size: 12px;
+        }
+        
+        .container {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 15mm;
+            min-height: 297mm;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #114495;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #114495;
+        }
+        
+        .title-section {
+            text-align: center;
+            flex-grow: 1;
+        }
+        
+        .main-title {
+            color: #114495;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #ee9d08;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn-excel {
+            background-color: #ee9d08;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 10px;
+        }
+        
+        .btn-excel:hover {
+            background-color: #d4860a;
+        }
+        
+        .btn-print {
+            background-color: #114495;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 10px;
+        }
+        
+        .btn-print:hover {
+            background-color: #0a3275;
+        }
+        
+        .btn-save {
+            background-color: #00b894;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 10px;
+        }
+        
+        .btn-save:hover {
+            background-color: #00967c;
+        }
+        
+        .form-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #ee9d08;
+            margin-bottom: 20px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #114495;
+        }
+        
+        .info-input {
+            border: none;
+            border-bottom: 1px solid #ccc;
+            min-width: 200px;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            background: transparent;
+            padding: 2px;
+        }
+        
+        .info-input:focus {
+            outline: none;
+            border-bottom: 2px solid #114495;
+        }
+        
+        .table-container {
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        
+        .section-title {
+            background-color: #114495;
+            color: white;
+            padding: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #114495;
+        }
+        
+        th {
+            background-color: #ee9d08;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 11px;
+            border: 1px solid #ccc;
+        }
+        
+        td {
+            padding: 4px;
+            text-align: center;
+            border: 1px solid #ccc;
+            height: 35px;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .data-input {
+            width: 100%;
+            border: none;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            background: transparent;
+            padding: 4px;
+            font-size: 11px;
+        }
+        
+        .data-input:focus {
+            outline: none;
+            background-color: #e3f2fd;
+        }
+        
+        .data-input:disabled {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+            color: #666;
+        }
+        
+        .data-select {
+            width: 100%;
+            border: none;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            background: transparent;
+            padding: 4px;
+            font-size: 11px;
+        }
+        
+        .data-select:disabled {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+            color: #666;
+        }
+        
+        .btn-delete {
+            padding: 4px 8px;
+            font-size: 11px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        
+        .calculated {
+            background-color: #ffed00 !important;
+            font-weight: 600;
+        }
+        
+        .total-row {
+            background-color: #ffed00 !important;
+            font-weight: 600;
+        }
+        
+        .status-cobrado {
+            background-color: #00b894 !important;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .status-porcobrar {
+            background-color: #ffeaa7 !important;
+            color: #d63031;
+            font-weight: 600;
+        }
+        
+        .summary-section {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .summary-box {
+            border: 2px solid #114495;
+            padding: 15px;
+        }
+        
+        .summary-box.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .summary-title {
+            background-color: #e6331b;
+            color: white;
+            padding: 8px;
+            margin: -15px -15px 15px -15px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px dotted #ccc;
+        }
+        
+        .summary-value {
+            font-weight: 600;
+            color: #114495;
+        }
+        
+        .subsection-title {
+            font-weight: 600;
+            color: #114495;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #f0f0f0;
+        }
+        
+        .client-item {
+            font-size: 10px;
+            padding: 3px 0;
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #ccc;
+            color: #666;
+            font-size: 10px;
+        }
+
+        @media print {
+            .controls { display: none; }
+            body { font-size: 10px; }
+            .container { padding: 10mm; }
+            .logo { width: 50px; height: 50px; }
+            .main-title { font-size: 20px; }
+            .subtitle { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <img src="logo.png" alt="Logo" class="logo">
+                <img src="CECAP.png" alt="CECAP" class="logo">
+            </div>
+            <div class="title-section">
+                <h1 class="main-title">REGISTRO DE VENTAS - HUEVOS</h1>
+                <p class="subtitle">Emprendimiento Avícola</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-save" onclick="saveData()">💾 Guardar Datos</button>
+            <button class="btn-excel" onclick="exportToExcel()">📊 Descargar Excel</button>
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+        </div>
+
+        <div class="form-info">
+            <div class="info-row">
+                <span class="info-label">Período:</span>
+                <input type="text" class="info-input" id="periodo" placeholder="Ej: Enero 2025">
+                <span class="info-label">Responsable:</span>
+                <input type="text" class="info-input" id="responsable" placeholder="Nombre del responsable">
+            </div>
+            <div class="info-row">
+                <span class="info-label">Fecha de Elaboración:</span>
+                <input type="date" class="info-input" id="fecha">
+                <span class="info-label">Página:</span>
+                <input type="text" class="info-input" id="pagina" placeholder="1 de 1">
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h3 class="section-title">DETALLE DE VENTAS DE HUEVOS</h3>
+            <table id="ventasTable">
+                <thead>
+                    <tr>
+                        <th style="width: 8%">Fecha</th>
+                        <th style="width: 14%">Vendedor</th>
+                        <th style="width: 14%">Cliente</th>
+                        <th style="width: 8%">Cant.</th>
+                        <th style="width: 11%">Presentación</th>
+                        <th style="width: 9%">P. Unit. (Q)</th>
+                        <th style="width: 9%">Total (Q)</th>
+                        <th style="width: 10%">F. Pago</th>
+                        <th style="width: 9%">Estado</th>
+                        <th style="width: 8%">Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="ventasBody">
+                    <!-- Las filas se generarán con JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-box">
+                <div class="summary-title">ESTADO GENERAL (COMO SE REGISTRÓ)</div>
+                <div class="summary-item">
+                    <span>Total Unidades Vendidas:</span>
+                    <span class="summary-value" id="totalUnidades">0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Total Cartones:</span>
+                    <span class="summary-value" id="totalCartones">0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Total Ventas:</span>
+                    <span class="summary-value" id="totalVentasQ">Q0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Precio Promedio/Unidad:</span>
+                    <span class="summary-value" id="promUnidad">Q0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Precio Promedio/Cartón:</span>
+                    <span class="summary-value" id="promCarton">Q0.00</span>
+                </div>
+            </div>
+            
+            <div class="summary-box">
+                <div class="summary-title">TODO EN UNIDADES</div>
+                <div class="summary-item">
+                    <span>Total Unidades:</span>
+                    <span class="summary-value" id="totalUnidadesConv">0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Total Ventas:</span>
+                    <span class="summary-value" id="totalVentasUnidades">Q0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Precio Promedio/Unidad:</span>
+                    <span class="summary-value" id="promUnidadConv">Q0.00</span>
+                </div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-title">TODO EN CARTONES</div>
+                <div class="summary-item">
+                    <span>Total Cartones:</span>
+                    <span class="summary-value" id="cartonesDecimal">0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Cartones Completos:</span>
+                    <span class="summary-value" id="cartonesCompletos">0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Unidades Sobrantes:</span>
+                    <span class="summary-value" id="unidadesSobrantes">0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Total Ventas:</span>
+                    <span class="summary-value" id="totalVentasCartones">Q0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Precio Promedio/Cartón:</span>
+                    <span class="summary-value" id="promCartonConv">Q0.00</span>
+                </div>
+            </div>
+            
+            <div class="summary-box">
+                <div class="summary-title">ESTADO DE COBROS</div>
+                <div class="summary-item">
+                    <span>Cobrado:</span>
+                    <span class="summary-value" id="montoCobrado">Q0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Por Cobrar:</span>
+                    <span class="summary-value" id="montoPorCobrar">Q0.00</span>
+                </div>
+                <div class="summary-item" style="border-top: 2px solid #114495; font-weight: 600; margin-top: 10px;">
+                    <span>TOTAL:</span>
+                    <span class="summary-value" id="totalEstados">Q0.00</span>
+                </div>
+                <div class="summary-item" style="border-top: 1px solid #ccc; margin-top: 10px;">
+                    <span>% Efectividad Cobro:</span>
+                    <span class="summary-value" id="efectividadCobro">0%</span>
+                </div>
+            </div>
+
+            <div class="summary-box full-width">
+                <div class="summary-title">ANÁLISIS POR VENDEDOR</div>
+                <div id="vendedorAnalysis"></div>
+            </div>
+
+            <div class="summary-box full-width">
+                <div class="summary-title">RESUMEN DE CLIENTES</div>
+                <div id="clienteAnalysis"></div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="container">
+                <p>© 2025. CECAP. Amigos de Santa Cruz.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let salesData = [];
+        let currentEditRow = -1;
+
+        // Cargar datos guardados al iniciar
+        function loadSavedData() {
+            const saved = localStorage.getItem('ventasHuevos');
+            if (saved) {
+                salesData = JSON.parse(saved);
+                renderTable();
+                calculateSummary();
+            } else {
+                initializeTable();
+            }
+            
+            // Cargar información general
+            document.getElementById('periodo').value = localStorage.getItem('periodo') || '';
+            document.getElementById('responsable').value = localStorage.getItem('responsable') || '';
+        }
+
+        // Guardar datos
+        function saveData() {
+            localStorage.setItem('ventasHuevos', JSON.stringify(salesData));
+            localStorage.setItem('periodo', document.getElementById('periodo').value);
+            localStorage.setItem('responsable', document.getElementById('responsable').value);
+            alert('Datos guardados exitosamente');
+        }
+
+        // Inicializar la tabla vacía
+        function initializeTable() {
+            const tbody = document.getElementById('ventasBody');
+            tbody.innerHTML = '';
+            addNewRow();
+        }
+
+        // Agregar nueva fila editable
+        function addNewRow() {
+            const tbody = document.getElementById('ventasBody');
+            const rowIndex = salesData.length;
+            const row = tbody.insertRow();
+            
+            row.innerHTML = `
+                <td><input type="date" class="data-input" id="fecha_${rowIndex}"></td>
+                <td><input type="text" class="data-input" id="vendedor_${rowIndex}" placeholder="Nombre vendedor"></td>
+                <td><input type="text" class="data-input" id="cliente_${rowIndex}" placeholder="Nombre cliente"></td>
+                <td><input type="number" class="data-input" id="cantidad_${rowIndex}" onchange="calculateRow(${rowIndex})" placeholder="0"></td>
+                <td>
+                    <select class="data-select" id="presentacion_${rowIndex}" onchange="calculateRow(${rowIndex})">
+                        <option value="">Seleccionar</option>
+                        <option value="Unidad">Unidad</option>
+                        <option value="Carton">Cartón (30 unid)</option>
+                    </select>
+                </td>
+                <td><input type="number" step="0.01" class="data-input" id="precio_${rowIndex}" onchange="calculateRow(${rowIndex})" placeholder="0.00"></td>
+                <td class="calculated"><span id="total_${rowIndex}">Q0.00</span></td>
+                <td>
+                    <select class="data-select" id="formapago_${rowIndex}">
+                        <option value="">Seleccionar</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Transferencia">Transferencia</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="data-select" id="estado_${rowIndex}" onchange="updateRowColor(${rowIndex})">
+                        <option value="">Seleccionar</option>
+                        <option value="Cobrado">Cobrado</option>
+                        <option value="Por Cobrar">Por Cobrar</option>
+                    </select>
+                </td>
+                <td><button onclick="confirmRow(${rowIndex})" style="padding: 4px 8px; font-size: 11px;">✓ Confirmar</button></td>
+            `;
+            
+            currentEditRow = rowIndex;
+        }
+
+        // Renderizar tabla completa
+        function renderTable() {
+            const tbody = document.getElementById('ventasBody');
+            tbody.innerHTML = '';
+            
+            salesData.forEach((sale, index) => {
+                const row = tbody.insertRow();
+                const isLocked = sale.locked;
+                
+                row.innerHTML = `
+                    <td><input type="date" class="data-input" id="fecha_${index}" value="${sale.fecha}" ${isLocked ? 'disabled' : ''}></td>
+                    <td><input type="text" class="data-input" id="vendedor_${index}" value="${sale.vendedor}" ${isLocked ? 'disabled' : ''}></td>
+                    <td><input type="text" class="data-input" id="cliente_${index}" value="${sale.cliente}" ${isLocked ? 'disabled' : ''}></td>
+                    <td><input type="number" class="data-input" id="cantidad_${index}" value="${sale.cantidad}" onchange="calculateRow(${index})" ${isLocked ? 'disabled' : ''}></td>
+                    <td>
+                        <select class="data-select" id="presentacion_${index}" onchange="calculateRow(${index})" ${isLocked ? 'disabled' : ''}>
+                            <option value="">Seleccionar</option>
+                            <option value="Unidad" ${sale.presentacion === 'Unidad' ? 'selected' : ''}>Unidad</option>
+                            <option value="Carton" ${sale.presentacion === 'Carton' ? 'selected' : ''}>Cartón (30 unid)</option>
+                        </select>
+                    </td>
+                    <td><input type="number" step="0.01" class="data-input" id="precio_${index}" value="${sale.precio}" onchange="calculateRow(${index})" ${isLocked ? 'disabled' : ''}></td>
+                    <td class="calculated"><span id="total_${index}">Q${sale.total.toFixed(2)}</span></td>
+                    <td>
+                        <select class="data-select" id="formapago_${index}" ${isLocked ? 'disabled' : ''}>
+                            <option value="">Seleccionar</option>
+                            <option value="Efectivo" ${sale.formaPago === 'Efectivo' ? 'selected' : ''}>Efectivo</option>
+                            <option value="Transferencia" ${sale.formaPago === 'Transferencia' ? 'selected' : ''}>Transferencia</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="data-select" id="estado_${index}" onchange="updateRowColor(${index})">
+                            <option value="">Seleccionar</option>
+                            <option value="Cobrado" ${sale.estado === 'Cobrado' ? 'selected' : ''}>Cobrado</option>
+                            <option value="Por Cobrar" ${sale.estado === 'Por Cobrar' ? 'selected' : ''}>Por Cobrar</option>
+                        </select>
+                    </td>
+                    <td>
+                        ${isLocked ? 
+                            `<button onclick="unlockRow(${index})" style="padding: 4px 8px; font-size: 11px;">🔒 Editar</button>
+                             <button onclick="deleteRow(${index})" class="btn-delete">🗑️</button>` :
+                            `<button onclick="confirmRow(${index})" style="padding: 4px 8px; font-size: 11px;">✓ Confirmar</button>`
+                        }
+                    </td>
+                `;
+                
+                updateRowColor(index);
+            });
+            
+            // Agregar nueva fila si no hay una activa
+            if (currentEditRow === -1) {
+                addNewRow();
+            }
+        }
+
+        // Confirmar fila
+        function confirmRow(index) {
+            const fecha = document.getElementById(`fecha_${index}`).value;
+            const vendedor = document.getElementById(`vendedor_${index}`).value;
+            const cliente = document.getElementById(`cliente_${index}`).value;
+            const cantidad = parseFloat(document.getElementById(`cantidad_${index}`).value) || 0;
+            const presentacion = document.getElementById(`presentacion_${index}`).value;
+            const precio = parseFloat(document.getElementById(`precio_${index}`).value) || 0;
+            const formaPago = document.getElementById(`formapago_${index}`).value;
+            const estado = document.getElementById(`estado_${index}`).value;
+            
+            if (!fecha || !vendedor || !cliente || !presentacion || !formaPago || !estado || cantidad === 0 || precio === 0) {
+                alert('Por favor complete todos los campos antes de confirmar');
+                return;
+            }
+            
+            const total = cantidad * precio;
+            
+            const saleData = {
+                fecha,
+                vendedor,
+                cliente,
+                cantidad,
+                presentacion,
+                precio,
+                total,
+                formaPago,
+                estado,
+                locked: true
+            };
+            
+            if (index < salesData.length) {
+                salesData[index] = saleData;
+            } else {
+                salesData.push(saleData);
+            }
+            
+            currentEditRow = -1;
+            renderTable();
+            calculateSummary();
+            saveData();
+        }
+
+        // Desbloquear fila para edición
+        function unlockRow(index) {
+            const password = prompt('Ingrese la contraseña para editar:');
+            if (password === 'ASC2025') {
+                salesData[index].locked = false;
+                currentEditRow = index;
+                renderTable();
+            } else {
+                alert('Contraseña incorrecta');
+            }
+        }
+
+        // Eliminar fila
+        function deleteRow(index) {
+            const password = prompt('Ingrese la contraseña para eliminar este registro:');
+            if (password === 'ASC2025') {
+                if (confirm('¿Está seguro de eliminar este registro? Esta acción no se puede deshacer.')) {
+                    salesData.splice(index, 1);
+                    renderTable();
+                    calculateSummary();
+                    saveData();
+                    alert('Registro eliminado correctamente');
+                }
+            } else {
+                alert('Contraseña incorrecta');
+            }
+        }
+
+        // Calcular total por fila
+        function calculateRow(index) {
+            const cantidad = parseFloat(document.getElementById(`cantidad_${index}`).value) || 0;
+            const precio = parseFloat(document.getElementById(`precio_${index}`).value) || 0;
+            
+            const total = cantidad * precio;
+            document.getElementById(`total_${index}`).textContent = `Q${total.toFixed(2)}`;
+            
+            if (index < salesData.length) {
+                salesData[index].cantidad = cantidad;
+                salesData[index].precio = precio;
+                salesData[index].total = total;
+            }
+        }
+
+        // Actualizar color de fila según estado
+        function updateRowColor(index) {
+            const estado = document.getElementById(`estado_${index}`).value;
+            const row = document.getElementById('ventasTable').rows[index + 1];
+            
+            if (!row) return;
+            
+            // Remover clases anteriores
+            row.classList.remove('status-cobrado', 'status-porcobrar');
+            
+            // Aplicar nueva clase según estado
+            switch(estado) {
+                case 'Cobrado':
+                    row.classList.add('status-cobrado');
+                    break;
+                case 'Por Cobrar':
+                    row.classList.add('status-porcobrar');
+                    break;
+            }
+            
+            if (index < salesData.length) {
+                salesData[index].estado = estado;
+                calculateSummary();
+            }
+        }
+
+        // Calcular resumen y totales
+        function calculateSummary() {
+            let totalUnidades = 0;
+            let totalCartones = 0;
+            let totalVentas = 0;
+            let montoCobrado = 0;
+            let montoPorCobrar = 0;
+            let ventasUnidad = 0;
+            let ventasCarton = 0;
+            let cantUnidad = 0;
+            let cantCarton = 0;
+            let totalUnidadesConvertidas = 0;
+
+            // Análisis por vendedor
+            const vendedorStats = {};
+            // Análisis por cliente
+            const clienteStats = {};
+
+            salesData.forEach(sale => {
+                if (sale.total > 0) {
+                    totalVentas += sale.total;
+                    
+                    // Calcular unidades totales y conversiones
+                    if (sale.presentacion === 'Unidad') {
+                        totalUnidades += sale.cantidad;
+                        totalUnidadesConvertidas += sale.cantidad;
+                        ventasUnidad += sale.total;
+                        cantUnidad += sale.cantidad;
+                    } else if (sale.presentacion === 'Carton') {
+                        totalUnidades += sale.cantidad * 30;
+                        totalUnidadesConvertidas += sale.cantidad * 30;
+                        totalCartones += sale.cantidad;
+                        ventasCarton += sale.total;
+                        cantCarton += sale.cantidad;
+                    }
+                    
+                    // Agrupar por estado
+                    if (sale.estado === 'Cobrado') {
+                        montoCobrado += sale.total;
+                    } else if (sale.estado === 'Por Cobrar') {
+                        montoPorCobrar += sale.total;
+                    }
+
+                    // Análisis por vendedor
+                    if (!vendedorStats[sale.vendedor]) {
+                        vendedorStats[sale.vendedor] = {
+                            unidades: 0,
+                            cartones: 0,
+                            total: 0,
+                            cobrado: 0,
+                            porCobrar: 0
+                        };
+                    }
+                    
+                    if (sale.presentacion === 'Unidad') {
+                        vendedorStats[sale.vendedor].unidades += sale.cantidad;
+                    } else {
+                        vendedorStats[sale.vendedor].cartones += sale.cantidad;
+                    }
+                    vendedorStats[sale.vendedor].total += sale.total;
+                    if (sale.estado === 'Cobrado') {
+                        vendedorStats[sale.vendedor].cobrado += sale.total;
+                    } else {
+                        vendedorStats[sale.vendedor].porCobrar += sale.total;
+                    }
+
+                    // Análisis por cliente
+                    if (!clienteStats[sale.cliente]) {
+                        clienteStats[sale.cliente] = {
+                            unidades: 0,
+                            totalVenta: 0,
+                            totalPagado: 0,
+                            totalPorCobrar: 0,
+                            compras: []
+                        };
+                    }
+                    
+                    const unidadesVenta = sale.presentacion === 'Unidad' ? sale.cantidad : sale.cantidad * 30;
+                    clienteStats[sale.cliente].unidades += unidadesVenta;
+                    clienteStats[sale.cliente].totalVenta += sale.total;
+                    
+                    if (sale.estado === 'Cobrado') {
+                        clienteStats[sale.cliente].totalPagado += sale.total;
+                    } else {
+                        clienteStats[sale.cliente].totalPorCobrar += sale.total;
+                    }
+                    
+                    clienteStats[sale.cliente].compras.push({
+                        fecha: sale.fecha,
+                        vendedor: sale.vendedor,
+                        cantidad: sale.cantidad,
+                        presentacion: sale.presentacion,
+                        precio: sale.precio,
+                        total: sale.total,
+                        estado: sale.estado,
+                        formaPago: sale.formaPago
+                    });
+                }
+            });
+
+            // Calcular promedios
+            const promUnidad = cantUnidad > 0 ? (ventasUnidad / cantUnidad) : 0;
+            const promCarton = cantCarton > 0 ? (ventasCarton / cantCarton) : 0;
+            const promUnidadConv = totalUnidadesConvertidas > 0 ? (totalVentas / totalUnidadesConvertidas) : 0;
+            const cartonesDecimales = totalUnidadesConvertidas / 30;
+            const cartonesCompletos = Math.floor(totalUnidadesConvertidas / 30);
+            const unidadesSobrantes = totalUnidadesConvertidas % 30;
+            const promCartonConv = cartonesDecimales > 0 ? (totalVentas / cartonesDecimales) : 0;
+
+            // Actualizar estado general
+            document.getElementById('totalUnidades').textContent = totalUnidades;
+            document.getElementById('totalCartones').textContent = totalCartones;
+            document.getElementById('totalVentasQ').textContent = `Q${totalVentas.toFixed(2)}`;
+            document.getElementById('promUnidad').textContent = `Q${promUnidad.toFixed(2)}`;
+            document.getElementById('promCarton').textContent = `Q${promCarton.toFixed(2)}`;
+
+            // Actualizar todo en unidades
+            document.getElementById('totalUnidadesConv').textContent = totalUnidadesConvertidas;
+            document.getElementById('totalVentasUnidades').textContent = `Q${totalVentas.toFixed(2)}`;
+            document.getElementById('promUnidadConv').textContent = `Q${promUnidadConv.toFixed(2)}`;
+
+            // Actualizar todo en cartones
+            document.getElementById('cartonesDecimal').textContent = cartonesDecimales.toFixed(2);
+            document.getElementById('cartonesCompletos').textContent = cartonesCompletos;
+            document.getElementById('unidadesSobrantes').textContent = unidadesSobrantes;
+            document.getElementById('totalVentasCartones').textContent = `Q${totalVentas.toFixed(2)}`;
+            document.getElementById('promCartonConv').textContent = `Q${promCartonConv.toFixed(2)}`;
+
+            // Actualizar estado de cobros
+            document.getElementById('montoCobrado').textContent = `Q${montoCobrado.toFixed(2)}`;
+            document.getElementById('montoPorCobrar').textContent = `Q${montoPorCobrar.toFixed(2)}`;
+            document.getElementById('totalEstados').textContent = `Q${totalVentas.toFixed(2)}`;
+
+            // Calcular efectividad de cobro
+            const efectividad = totalVentas > 0 ? ((montoCobrado / totalVentas) * 100).toFixed(1) : 0;
+            document.getElementById('efectividadCobro').textContent = `${efectividad}%`;
+
+            // Mostrar análisis por vendedor
+            const vendedorDiv = document.getElementById('vendedorAnalysis');
+            vendedorDiv.innerHTML = '';
+            
+            Object.keys(vendedorStats).sort().forEach(vendedor => {
+                const stats = vendedorStats[vendedor];
+                const totalUnidadesVendedor = stats.unidades + (stats.cartones * 30);
+                vendedorDiv.innerHTML += `
+                    <div class="subsection-title">${vendedor}</div>
+                    <div class="summary-item">
+                        <span>Unidades vendidas:</span>
+                        <span class="summary-value">${stats.unidades}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Cartones vendidos:</span>
+                        <span class="summary-value">${stats.cartones}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total unidades (convertido):</span>
+                        <span class="summary-value">${totalUnidadesVendedor}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total ventas:</span>
+                        <span class="summary-value">Q${stats.total.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Cobrado:</span>
+                        <span class="summary-value">Q${stats.cobrado.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Por cobrar:</span>
+                        <span class="summary-value">Q${stats.porCobrar.toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            // Mostrar análisis por cliente
+            const clienteDiv = document.getElementById('clienteAnalysis');
+            clienteDiv.innerHTML = '';
+            
+            Object.keys(clienteStats).sort().forEach(cliente => {
+                const stats = clienteStats[cliente];
+                const precioPromedio = stats.unidades > 0 ? (stats.totalVenta / stats.unidades) : 0;
+                const porcentajePagado = stats.totalVenta > 0 ? ((stats.totalPagado / stats.totalVenta) * 100).toFixed(1) : 0;
+                
+                let detalleCompras = '';
+                stats.compras.forEach(compra => {
+                    const estadoIcon = compra.estado === 'Cobrado' ? '✓' : '⏰';
+                    detalleCompras += `
+                        <div style="margin-left: 20px; font-size: 10px; color: #666;">
+                            ${compra.fecha} - ${compra.cantidad} ${compra.presentacion} - Q${compra.total.toFixed(2)} 
+                            - ${compra.formaPago} - ${estadoIcon} ${compra.estado} 
+                            - Vendedor: ${compra.vendedor}
+                        </div>
+                    `;
+                });
+                
+                clienteDiv.innerHTML += `
+                    <div class="subsection-title">${cliente}</div>
+                    <div class="summary-item">
+                        <span>Total unidades compradas:</span>
+                        <span class="summary-value">${stats.unidades}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total compras:</span>
+                        <span class="summary-value">Q${stats.totalVenta.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Precio promedio/unidad:</span>
+                        <span class="summary-value">Q${precioPromedio.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total pagado:</span>
+                        <span class="summary-value" style="color: #00b894;">Q${stats.totalPagado.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Saldo pendiente:</span>
+                        <span class="summary-value" style="color: #d63031;">Q${stats.totalPorCobrar.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>% Pagado:</span>
+                        <span class="summary-value">${porcentajePagado}%</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <strong style="font-size: 11px;">Detalle de compras:</strong>
+                        ${detalleCompras}
+                    </div>
+                    <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
+                `;
+            });
+        }
+
+        // Exportar a Excel
+        function exportToExcel() {
+            const wb = XLSX.utils.book_new();
+            
+            // Información general
+            const info = [
+                ['REGISTRO DE VENTAS DE HUEVOS - EMPRENDIMIENTO AVÍCOLA'],
+                [''],
+                ['Período:', document.getElementById('periodo').value],
+                ['Responsable:', document.getElementById('responsable').value],
+                ['Fecha de Elaboración:', document.getElementById('fecha').value],
+                ['']
+            ];
+
+            // Datos de ventas
+            const headers = ['Fecha', 'Vendedor', 'Cliente', 'Cantidad', 'Presentación', 'P. Unit. (Q)', 'Total (Q)', 'F. Pago', 'Estado'];
+            const data = [headers];
+            
+            salesData.forEach(sale => {
+                data.push([
+                    sale.fecha,
+                    sale.vendedor,
+                    sale.cliente,
+                    sale.cantidad,
+                    sale.presentacion,
+                    sale.precio,
+                    sale.total,
+                    sale.formaPago,
+                    sale.estado
+                ]);
+            });
+
+            // Resumen
+            const resumen = [
+                [''],
+                ['ESTADO GENERAL'],
+                ['Total Unidades Vendidas:', document.getElementById('totalUnidades').textContent],
+                ['Total Cartones:', document.getElementById('totalCartones').textContent],
+                ['Total Ventas:', document.getElementById('totalVentasQ').textContent],
+                ['Precio Promedio/Unidad:', document.getElementById('promUnidad').textContent],
+                ['Precio Promedio/Cartón:', document.getElementById('promCarton').textContent],
+                [''],
+                ['TODO EN UNIDADES'],
+                ['Total Unidades:', document.getElementById('totalUnidadesConv').textContent],
+                ['Total Ventas:', document.getElementById('totalVentasUnidades').textContent],
+                ['Precio Promedio/Unidad:', document.getElementById('promUnidadConv').textContent],
+                [''],
+                ['TODO EN CARTONES'],
+                ['Total Cartones (con decimales):', document.getElementById('cartonesDecimal').textContent],
+                ['Cartones Completos:', document.getElementById('cartonesCompletos').textContent],
+                ['Unidades Sobrantes:', document.getElementById('unidadesSobrantes').textContent],
+                ['Total Ventas:', document.getElementById('totalVentasCartones').textContent],
+                ['Precio Promedio/Cartón:', document.getElementById('promCartonConv').textContent],
+                [''],
+                ['ESTADO DE COBROS'],
+                ['Cobrado:', document.getElementById('montoCobrado').textContent],
+                ['Por Cobrar:', document.getElementById('montoPorCobrar').textContent],
+                ['TOTAL:', document.getElementById('totalEstados').textContent],
+                ['% Efectividad Cobro:', document.getElementById('efectividadCobro').textContent]
+            ];
+
+            // Crear hojas
+            const wsInfo = XLSX.utils.aoa_to_sheet(info);
+            const wsData = XLSX.utils.aoa_to_sheet(data);
+            const wsResumen = XLSX.utils.aoa_to_sheet(resumen);
+            
+            XLSX.utils.book_append_sheet(wb, wsInfo, 'Información');
+            XLSX.utils.book_append_sheet(wb, wsData, 'Ventas');
+            XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+            
+            // Descargar
+            const periodo = document.getElementById('periodo').value || 'VentasHuevos';
+            XLSX.writeFile(wb, `RegistroVentasHuevos_${periodo.replace(/\s+/g, '_')}.xlsx`);
+        }
+
+        // Inicializar al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+            loadSavedData();
+        });
+    </script>
+</body>
+</html>
