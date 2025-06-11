@@ -526,7 +526,8 @@ const firebaseConfig = {
   appId: "1:356964819478:web:53280b3b60b9e826158b37"
 };
 
-
+firebase.initializeApp(firebaseConfig);
+database = firebase.database();
 
         // Variables globales
         let database;
@@ -565,21 +566,18 @@ const firebaseConfig = {
             });
         }
 
-       // Cargar datos guardados al iniciar desde Firebase
+     // CAMBIAR función loadSavedData
 function loadSavedData() {
-    db.collection("registroVentasHuevos")
-        .orderBy("fecha", "desc") // Carga el más reciente
-        .limit(1)
-        .get()
-        .then((querySnapshot) => {
-            if (!querySnapshot.empty) {
-                const doc = querySnapshot.docs[0].data();
+    database.ref("registroVentasHuevos").limitToLast(1).once("value")
+        .then((snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const doc = Object.values(data)[0]; // Accede al primer objeto
 
                 salesData = doc.ventas || [];
                 renderTable();
                 calculateSummary();
 
-                // Cargar información general
                 document.getElementById('periodo').value = doc.periodo || '';
                 document.getElementById('responsable').value = doc.responsable || '';
                 document.getElementById('fecha').value = doc.fecha || new Date().toISOString().split('T')[0];
@@ -588,10 +586,11 @@ function loadSavedData() {
             }
         })
         .catch((error) => {
-            console.error("Error al cargar los datos de Firebase:", error);
+            console.error("Error al cargar datos desde Firebase:", error);
             initializeTable();
         });
 }
+
             
             // Cargar desde Firebase con sincronización en tiempo real
             database.ref('ventas').on('value', (snapshot) => {
@@ -633,8 +632,8 @@ function loadSavedData() {
             });
         }
 
-        // Guardar datos en Firebase
-        function saveData() {
+        // CAMBIAR función saveData
+function saveData() {
     const docData = {
         periodo: document.getElementById('periodo').value,
         responsable: document.getElementById('responsable').value,
@@ -642,13 +641,14 @@ function loadSavedData() {
         ventas: salesData
     };
 
-    db.collection("registroVentasHuevos").add(docData)
+    const timestamp = Date.now(); // Genera una clave única
+    database.ref("registroVentasHuevos/" + timestamp).set(docData)
         .then(() => {
-            alert('Datos guardados en Firebase correctamente');
+            alert('Datos guardados correctamente en Firebase');
         })
         .catch((error) => {
             console.error("Error al guardar en Firebase:", error);
-            alert('Error al guardar en Firebase');
+            alert('Error al guardar los datos en Firebase');
         });
 }
 
