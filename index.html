@@ -6,6 +6,11 @@
     <title>Registro de Ventas - Emprendimiento Avícola</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -336,6 +341,7 @@
 
         @media print {
             .controls { display: none; }
+            #connectionStatus { display: none; }
             body { font-size: 10px; }
             .container { padding: 10mm; }
             .logo { width: 50px; height: 50px; }
@@ -358,6 +364,7 @@
         </div>
 
         <div class="controls">
+            <span id="connectionStatus" style="margin-right: 20px; font-weight: 600;">🔄 Conectando...</span>
             <button class="btn-save" onclick="saveData()">💾 Guardar Datos</button>
             <button class="btn-excel" onclick="exportToExcel()">📊 Descargar Excel</button>
             <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
@@ -505,32 +512,145 @@
     </div>
 
     <script>
+        // ⚠️ IMPORTANTE: REEMPLAZA ESTA CONFIGURACIÓN CON LA DE TU PROYECTO FIREBASE
+        // Sigue las instrucciones en el README para obtener estos valores
+        // Import the functions you need from the SDKs you need
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDBffYQbK_G38wvS6EyxwNILCrnsVGawJY",
+  authDomain: "granjasantacruz-8f047.firebaseapp.com",
+  databaseURL: "https://granjasantacruz-8f047-default-rtdb.firebaseio.com",
+  projectId: "granjasantacruz-8f047",
+  storageBucket: "granjasantacruz-8f047.firebasestorage.app",
+  messagingSenderId: "356964819478",
+  appId: "1:356964819478:web:53280b3b60b9e826158b37"
+};
+
+
+
+        // Variables globales
+        let database;
         let salesData = [];
         let currentEditRow = -1;
+        let isOnline = false;
 
-        // Cargar datos guardados al iniciar
-        function loadSavedData() {
-            const saved = localStorage.getItem('ventasHuevos');
-            if (saved) {
-                salesData = JSON.parse(saved);
+        // Inicializar Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            console.log('Firebase inicializado correctamente');
+        } catch (error) {
+            console.error('Error al inicializar Firebase:', error);
+            alert('Error al conectar con la base de datos. Trabajando en modo offline.');
+        }
+
+        // Verificar conexión a Firebase
+        function checkConnection() {
+            if (!database) {
+                document.getElementById('connectionStatus').textContent = '🔴 Sin Firebase';
+                return;
+            }
+            
+            const connectedRef = database.ref('.info/connected');
+            connectedRef.on('value', (snap) => {
+                if (snap.val() === true) {
+                    console.log('Conectado a Firebase');
+                    isOnline = true;
+                    document.getElementById('connectionStatus').textContent = '🟢 En línea';
+                } else {
+                    console.log('Sin conexión a Firebase');
+                    isOnline = false;
+                    document.getElementById('connectionStatus').textContent = '🔴 Sin conexión';
+                }
+            });
+        }
+
+       // Cargar datos guardados al iniciar desde Firebase
+function loadSavedData() {
+    db.collection("registroVentasHuevos")
+        .orderBy("fecha", "desc") // Carga el más reciente
+        .limit(1)
+        .get()
+        .then((querySnapshot) => {
+            if (!querySnapshot.empty) {
+                const doc = querySnapshot.docs[0].data();
+
+                salesData = doc.ventas || [];
                 renderTable();
                 calculateSummary();
+
+                // Cargar información general
+                document.getElementById('periodo').value = doc.periodo || '';
+                document.getElementById('responsable').value = doc.responsable || '';
+                document.getElementById('fecha').value = doc.fecha || new Date().toISOString().split('T')[0];
             } else {
                 initializeTable();
             }
+        })
+        .catch((error) => {
+            console.error("Error al cargar los datos de Firebase:", error);
+            initializeTable();
+        });
+}
             
+            // Cargar desde Firebase con sincronización en tiempo real
+            database.ref('ventas').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    salesData = Object.values(data);
+                    renderTable();
+                    calculateSummary();
+                    console.log('Datos sincronizados desde Firebase');
+                } else {
+                    // Si no hay datos en Firebase, intentar cargar de localStorage
+                    const saved = localStorage.getItem('ventasHuevos');
+                    if (saved) {
+                        salesData = JSON.parse(saved);
+                        renderTable();
+                        calculateSummary();
+                        // Subir datos locales a Firebase si estamos conectados
+                        if (isOnline && salesData.length > 0) {
+                            database.ref('ventas').set(salesData);
+                            console.log('Datos locales subidos a Firebase');
+                        }
+                    } else {
+                        initializeTable();
+                    }
+                }
+            });
+
             // Cargar información general
-            document.getElementById('periodo').value = localStorage.getItem('periodo') || '';
-            document.getElementById('responsable').value = localStorage.getItem('responsable') || '';
+            database.ref('info').on('value', (snapshot) => {
+                const info = snapshot.val();
+                if (info) {
+                    document.getElementById('periodo').value = info.periodo || '';
+                    document.getElementById('responsable').value = info.responsable || '';
+                } else {
+                    // Cargar de localStorage si no hay en Firebase
+                    document.getElementById('periodo').value = localStorage.getItem('periodo') || '';
+                    document.getElementById('responsable').value = localStorage.getItem('responsable') || '';
+                }
+            });
         }
 
-        // Guardar datos
+        // Guardar datos en Firebase
         function saveData() {
-            localStorage.setItem('ventasHuevos', JSON.stringify(salesData));
-            localStorage.setItem('periodo', document.getElementById('periodo').value);
-            localStorage.setItem('responsable', document.getElementById('responsable').value);
-            alert('Datos guardados exitosamente');
-        }
+    const docData = {
+        periodo: document.getElementById('periodo').value,
+        responsable: document.getElementById('responsable').value,
+        fecha: document.getElementById('fecha').value,
+        ventas: salesData
+    };
+
+    db.collection("registroVentasHuevos").add(docData)
+        .then(() => {
+            alert('Datos guardados en Firebase correctamente');
+        })
+        .catch((error) => {
+            console.error("Error al guardar en Firebase:", error);
+            alert('Error al guardar en Firebase');
+        });
+}
 
         // Inicializar la tabla vacía
         function initializeTable() {
@@ -674,7 +794,14 @@
             currentEditRow = -1;
             renderTable();
             calculateSummary();
-            saveData();
+            
+            // Guardar inmediatamente en Firebase
+            if (isOnline && database) {
+                database.ref('ventas').set(salesData);
+                console.log('Venta confirmada y sincronizada');
+            } else {
+                saveData();
+            }
         }
 
         // Desbloquear fila para edición
@@ -697,8 +824,15 @@
                     salesData.splice(index, 1);
                     renderTable();
                     calculateSummary();
-                    saveData();
-                    alert('Registro eliminado correctamente');
+                    
+                    // Sincronizar con Firebase
+                    if (isOnline && database) {
+                        database.ref('ventas').set(salesData);
+                        alert('Registro eliminado y sincronizado');
+                    } else {
+                        saveData();
+                        alert('Registro eliminado localmente');
+                    }
                 }
             } else {
                 alert('Contraseña incorrecta');
@@ -743,6 +877,11 @@
             if (index < salesData.length) {
                 salesData[index].estado = estado;
                 calculateSummary();
+                
+                // Sincronizar cambio de estado con Firebase
+                if (isOnline && database) {
+                    database.ref('ventas').set(salesData);
+                }
             }
         }
 
@@ -1053,7 +1192,8 @@
         // Inicializar al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
-            loadSavedData();
+            checkConnection();
+            setTimeout(loadSavedData, 1000); // Esperar un poco para verificar conexión
         });
     </script>
 </body>
